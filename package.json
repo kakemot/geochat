@@ -1,0 +1,28 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "start:ws": "node server.cjs",
+    "start": "concurrently \"npm run dev\" \"npm run start:ws\""
+  },
+  "dependencies": {
+    "@nuxt/ui": "^2.14.1",
+    "nuxt": "^3.10.3",
+    "vue": "^3.4.19",
+    "vue-router": "^4.3.0",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.10",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
+    "concurrently": "^8.2.2",
+    "leaflet": "^1.9.4",
+    "nuxt-icon": "^0.6.8"
+  }
+}
