@@ -1,7 +1,6 @@
 <template>
-<div class="flex flex-col m-8 mb-16 items-center justify-center h-screen">
-  <div class="w-full p-4 bg-slate-500 rounded-lg shadow">
-    <div class="overflow-y-auto h-screen p-2 bg-slate-800 rounded" ref="messageContainer">
+<div class="flex flex-col m-8 mb-16 items-center justify-center">
+    <div class="overflow-y-auto w-screen h-4/5 p-2 bg-slate-800 rounded" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
         <div v-if="msg.isYou" class="text-right">{{ msg.text }}</div>
         <div v-if="!msg.isYou" class="text-left">{{ msg.text }} </div>
@@ -12,7 +11,6 @@
       <input type="text" v-model="input" @keyup.enter="sendMessage" placeholder="Type a message..." class="flex-1 p-2 rounded-l outline-none">
       <button @click="sendMessage" class="bg-blue-500 text-white p-2 rounded-r">Send</button>
     </div>
-  </div>
 </div>
 
 </template>
@@ -31,7 +29,8 @@ const messageContainer = ref(null);
 let socket: any = null;
 
 onMounted(() => {
-  socket = new WebSocket(`ws://${window.location.hostname}:8081`);
+  let wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  socket = new WebSocket(`${wsProtocol}//${window.location.hostname}:8081`);
   socket.onopen = function(event: any) {
     console.log('Connected to WebSocket');
   };
@@ -79,6 +78,5 @@ function sendMessage() {
 }
 
 const scrollToBottom = () => {
-  messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
 };
 </script>
