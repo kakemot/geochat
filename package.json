@@ -9,7 +9,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "start:ws": "node server.cjs",
-    "start": "concurrently \"npm run dev\" \"npm run start:ws\""
+    "startdev": "concurrently \"npm run dev\" \"npm run start:ws\"",
+    "start": "concurrently \"nuxt start\" \"npm run start:ws\""
+
   },
   "dependencies": {
     "@nuxt/ui": "^2.14.1",
