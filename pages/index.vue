@@ -31,8 +31,7 @@ const messageContainer = ref(null);
 let socket: any = null;
 
 onMounted(() => {
-  socket = new WebSocket('ws://localhost:8081');
-
+  socket = new WebSocket(`ws://${window.location.hostname}:8081`);
   socket.onopen = function(event: any) {
     console.log('Connected to WebSocket');
   };
