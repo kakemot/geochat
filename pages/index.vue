@@ -1,7 +1,7 @@
 <template>
-<div class="flex flex-col items-center justify-center h-screen">
-  <div class="w-full max-w-md p-4 bg-slate-500 rounded-lg shadow">
-    <div class="overflow-y-auto h-96 mb-4 p-2 bg-slate-800 rounded" ref="messageContainer">
+<div class="flex flex-col m-8 mb-16 items-center justify-center h-screen">
+  <div class="w-full p-4 bg-slate-500 rounded-lg shadow">
+    <div class="overflow-y-auto h-screen p-2 bg-slate-800 rounded" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
         <div v-if="msg.isYou" class="text-right">{{ msg.text }}</div>
         <div v-if="!msg.isYou" class="text-left">{{ msg.text }} </div>
