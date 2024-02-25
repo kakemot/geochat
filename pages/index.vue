@@ -1,44 +1,63 @@
 <template>
-<div class="flex flex-col m-8 mb-16 items-center justify-center">
-    <div class="overflow-y-auto w-screen h-4/5 p-2 bg-slate-800 rounded" ref="messageContainer">
+<div class="flex flex-col m-8 items-center justify-center">
+<div class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 w-full">
+<div><span class="text-slate-500"> username </span><strong>{{ username }}</strong></div>
+<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.latitude }} {{ userLocation.longitude }}]</div>
+</div>
+    <div class="messages overflow-y-scroll min-h-20 w-full p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
-        <div v-if="msg.isYou" class="text-right">{{ msg.text }}</div>
+        <div v-if="msg.isYou" class="text-right text-blue-200">{{ msg.text }}</div>
         <div v-if="!msg.isYou" class="text-left">{{ msg.text }} </div>
       </div>
     </div>
 
-    <div class="flex flex-row">
-      <input type="text" v-model="input" @keyup.enter="sendMessage" placeholder="Type a message..." class="flex-1 p-2 rounded-l outline-none">
-      <button @click="sendMessage" class="bg-blue-500 text-white p-2 rounded-r">Send</button>
+    <div class="flex flex-row w-full">
+      <textarea v-model="input" @keyup.enter="sendMessage" placeholder="Type a message..." class="w-full p-2 rounded-l outline-none"></textarea>
+      <button @click="sendMessage" class="bg-slate-800 text-white p-2">send</button>
     </div>
 </div>
-
 </template>
+
+<style scoped>
+.messages {
+  height: calc(100vh - 12em);
+}
+</style>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue';
-
+import { generateRandomName } from '@/utils/randomNameGen';
 interface Message {
     isYou: boolean;
     text: string;
     timestamp: number;
 }
 
+const errorMessage = ref(null);
+const userLocation = ref({latitude: 0, longitude: 0}); // Initial dummy value, will be replaced
+const username = ref(generateRandomName());
 const messages = ref<Message[]>([]);
 const input = ref('');
 const messageContainer = ref(null);
 
 let socket: WebSocket | null = null;
 
-onMounted(() => {
-    let wsProtocol = window.location.protocol === "https:" ? "wss:" : "wss:";
-    socket = new WebSocket(`wss://geochat-bridge-quqoh4a5iq-ew.a.run.app/chat`);
-    
-    socket.onopen = function(event: Event) {
-        console.log('Connected to WebSocket');
-    };
+function initializeWebSocket() {
+    let chatServerHost = window.location.protocol === "https:" ? "wss://geochat-bridge-quqoh4a5iq-ew.a.run.app/chat" : "ws://localhost:8081/chat";
+    socket = new WebSocket(chatServerHost);
 
-    socket.onmessage = function(event: MessageEvent) {
+    socket.onopen = function(event) {
+        console.log('Connected to WebSocket');
+        // Send location immediately upon connection
+        if (socket) {
+            socket.send(JSON.stringify({
+                type: 'location',
+                latitude: userLocation.value.latitude,
+                longitude: userLocation.value.longitude
+            }));
+        }
+    };
+        socket.onmessage = function(event: MessageEvent) {
         if (event.data instanceof Blob) {
             // Convert Blob to text
             const reader = new FileReader();
@@ -60,6 +79,28 @@ onMounted(() => {
     socket.onerror = function(error: Event) {
         console.error('WebSocket Error:', error);
     };
+}
+
+onMounted(() => {
+          if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                userLocation.value = {
+                    latitude: position.coords.latitude.toFixed(2),
+                    longitude: position.coords.longitude.toFixed(2)
+                };
+                // Initialize WebSocket connection after getting location
+                initializeWebSocket();
+            },
+            error => {
+                errorMessage.value = `Error getting user location: ${error.message}`;
+                // Consider initializing WebSocket with default location or handling error
+            }
+        );
+    } else {
+        errorMessage.value = 'Geolocation is not supported by this browser.';
+        // Consider initializing WebSocket with default location or handling error
+    }
 });
 
 onUnmounted(() => {
@@ -82,7 +123,10 @@ function addMessage(isYou: boolean, text: string) {
 
 function sendMessage() {
     if (socket && input.value.trim() !== '') {
-        socket.send(input.value);
+                  socket.send(JSON.stringify({
+                type: 'chat',
+                content: `${username.value}: ${input.value}`,
+            }));
         addMessage(true, input.value);
         input.value = '';
     }
