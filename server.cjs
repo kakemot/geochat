@@ -1,8 +1,6 @@
 const WebSocket = require('ws');
 
-const server = require('http').createServer();
-const wss = new WebSocket.Server({ server });
-server.listen(8081);
+const wss = new WebSocket.Server({ port: 443, path: '/chat' });
 
 const clients = new Set();
 

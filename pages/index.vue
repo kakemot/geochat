@@ -30,7 +30,7 @@ let socket: any = null;
 
 onMounted(() => {
   let wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  socket = new WebSocket(`${wsProtocol}//${window.location.hostname}:8081`);
+  socket = new WebSocket(`${wsProtocol}//${window.location.hostname}/chat`);
   socket.onopen = function(event: any) {
     console.log('Connected to WebSocket');
   };
