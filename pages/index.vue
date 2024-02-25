@@ -20,7 +20,7 @@
 
 <style scoped>
 .messages {
-  height: calc(100vh - 14em);
+  height: calc(100vh - 16em);
 }
 
 .wcalc {

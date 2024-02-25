@@ -32,4 +32,4 @@ wss.on('connection', function connection(ws) {
     });
 });
 
-console.log('Chat server running on ws://localhost:8080');
+console.log('Chat server running);
