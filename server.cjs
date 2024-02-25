@@ -4,17 +4,13 @@ const wss = new WebSocket.Server({ port: 8081 });
 const clients = new Map(); // Use a Map to associate clients with locations
 
 function checkIfNearby(long1, lat1, long2, lat2, km) {
-    // Radius of the Earth in kilometers
     const R = 6371;
-
-    // Convert degrees to radians
     const rad = (deg) => deg * (Math.PI / 180);
 
-    // Difference in coordinates
     const dLat = rad(lat2 - lat1);
     const dLong = rad(long2 - long1);
 
-    // Apply Haversine formula
+    // Haversine formula
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(rad(lat1)) * Math.cos(rad(lat2)) *
