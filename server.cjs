@@ -1,6 +1,8 @@
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8081 });
+const server = require('http').createServer();
+const wss = new WebSocket.Server({ server });
+server.listen(8081);
 
 const clients = new Set();
 
@@ -25,4 +27,4 @@ wss.on('connection', function connection(ws) {
     });
 });
 
-console.log('Chat server running on ws://localhost:8081');
+console.log('Chat server running');
