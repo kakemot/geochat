@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 443, path: '/chat' });
+const port = process.env.PORT || 8080; // Default to 8080 if PORT isn't set
+const wss = new WebSocket.Server({ port: port, path: '/chat' });
 
 const clients = new Set();
 
