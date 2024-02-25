@@ -1,17 +1,17 @@
 <template>
 <div class="flex flex-col m-8 items-center justify-center">
-<div class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 w-full">
+<div class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc">
 <div><span class="text-slate-500"> username </span><strong>{{ username }}</strong></div>
 <div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.latitude }} {{ userLocation.longitude }}]</div>
 </div>
-    <div class="messages overflow-y-scroll min-h-20 w-full p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
+    <div class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
         <div v-if="msg.isYou" class="text-right text-blue-200">{{ msg.text }}</div>
         <div v-if="!msg.isYou" class="text-left">{{ msg.text }} </div>
       </div>
     </div>
 
-    <div class="flex flex-row w-full">
+    <div class="flex flex-row wcalc">
       <textarea v-model="input" @keyup.enter="sendMessage" placeholder="Type a message..." class="w-full p-2 rounded-l outline-none"></textarea>
       <button @click="sendMessage" class="bg-slate-800 text-white p-2">send</button>
     </div>
@@ -21,6 +21,10 @@
 <style scoped>
 .messages {
   height: calc(100vh - 12em);
+}
+
+.wcalc {
+  width: calc(100vw - 8em);
 }
 </style>
 
