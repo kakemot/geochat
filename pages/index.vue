@@ -1,8 +1,8 @@
 <template>
-<div class="flex flex-col m-8 items-center justify-center">
+<div class="flex flex-col m-6 items-center justify-center">
 <div class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc">
 <div><span class="text-slate-500"> username </span><strong>{{ username }}</strong></div>
-<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.latitude }} {{ userLocation.longitude }}]</div>
+<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.latitude }}° {{ userLocation.longitude }}°]</div>
 </div>
     <div class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
@@ -20,7 +20,7 @@
 
 <style scoped>
 .messages {
-  height: calc(100vh - 16em);
+  height: calc(100vh - 17em);
 }
 
 .wcalc {
@@ -90,8 +90,8 @@ onMounted(() => {
         navigator.geolocation.getCurrentPosition(
             position => {
                 userLocation.value = {
-                    latitude: position.coords.latitude.toFixed(2),
-                    longitude: position.coords.longitude.toFixed(2)
+                    latitude: position.coords.latitude.toFixed(1),
+                    longitude: position.coords.longitude.toFixed(1)
                 };
                 // Initialize WebSocket connection after getting location
                 initializeWebSocket();
