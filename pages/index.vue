@@ -29,8 +29,8 @@ const messageContainer = ref(null);
 let socket: any = null;
 
 onMounted(() => {
-  let wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  socket = new WebSocket(`${wsProtocol}//${window.location.hostname}/chat`);
+  let wsProtocol = window.location.protocol === "https:" ? "wss:" : "wss:";
+  socket = new WebSocket(`${wsProtocol}//geochat-bridge-quqoh4a5iq-ew.a.run.app:8080`);
   socket.onopen = function(event: any) {
     console.log('Connected to WebSocket');
   };
