@@ -12,7 +12,7 @@
     </div>
 
     <div class="flex flex-row wcalc">
-      <textarea v-model="input" @keyup.enter="sendMessage" placeholder="Type a message..." class="w-full p-2 rounded-l outline-none"></textarea>
+      <textarea v-model="input" @keyup.enter="sendMessage" placeholder="Type a message..." class="w-full p-2 rounded-l outline-none text-lg"></textarea>
       <button @click="sendMessage" class="bg-slate-800 text-white p-2">send</button>
     </div>
 </div>
@@ -24,7 +24,7 @@
 }
 
 .wcalc {
-  width: calc(100vw - 8em);
+  width: calc(100vw - 2em);
 }
 </style>
 
