@@ -16,6 +16,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+
 interface Message {
     isYou: boolean;
     text: string;
@@ -26,57 +28,70 @@ const messages = ref<Message[]>([]);
 const input = ref('');
 const messageContainer = ref(null);
 
-let socket: any = null;
+let socket: WebSocket | null = null;
 
 onMounted(() => {
-  let wsProtocol = window.location.protocol === "https:" ? "wss:" : "wss:";
-  socket = new WebSocket(`wss://geochat-bridge-quqoh4a5iq-ew.a.run.app/chat`);
-  socket.onopen = function(event: any) {
-    console.log('Connected to WebSocket');
-  };
+    let wsProtocol = window.location.protocol === "https:" ? "wss:" : "wss:";
+    socket = new WebSocket(`wss://geochat-bridge-quqoh4a5iq-ew.a.run.app/chat`);
+    
+    socket.onopen = function(event: Event) {
+        console.log('Connected to WebSocket');
+    };
 
-  socket.onmessage = function(event: any) {
-    let newMessage = {
-        isYou: false,
-        text: event.data,
-        timestamp: 12345
-    }
+    socket.onmessage = function(event: MessageEvent) {
+        if (event.data instanceof Blob) {
+            // Convert Blob to text
+            const reader = new FileReader();
+            reader.onload = function() {
+                const text = reader.result as string;
+                addMessage(false, text);
+            };
+            reader.readAsText(event.data);
+        } else {
+            // Data is already text
+            addMessage(false, event.data);
+        }
+    };
 
-    messages.value.push(newMessage);
-  };
+    socket.onclose = function(event: CloseEvent) {
+        console.log('Disconnected from WebSocket');
+    };
 
-  socket.onclose = function(event: any) {
-    console.log('Disconnected from WebSocket');
-  };
-
-  socket.onerror = function(error: any) {
-    console.error('WebSocket Error:', error);
-  };
+    socket.onerror = function(error: Event) {
+        console.error('WebSocket Error:', error);
+    };
 });
 
 onUnmounted(() => {
-  if (socket !== null) {
-    socket.close();
-  }
+    if (socket !== null) {
+        socket.close();
+    }
 });
 
-function sendMessage() {
-  if (socket && input.value.trim() !== '') {
-    socket.send(input.value);
-        let newMessage = {
-        isYou: true,
-        text: input.value,
-        timestamp: 12345
-    }
-
+function addMessage(isYou: boolean, text: string) {
+    const newMessage: Message = {
+        isYou,
+        text,
+        timestamp: Date.now() // Use the current timestamp
+    };
     messages.value.push(newMessage);
-    input.value = '';
-        nextTick(() => {
-      scrollToBottom();
+    nextTick(() => {
+        scrollToBottom();
     });
-  }
+}
+
+function sendMessage() {
+    if (socket && input.value.trim() !== '') {
+        socket.send(input.value);
+        addMessage(true, input.value);
+        input.value = '';
+    }
 }
 
 const scrollToBottom = () => {
+    // Implementation to scroll to the bottom of your message container
+    if (messageContainer.value) {
+        messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
+    }
 };
 </script>
