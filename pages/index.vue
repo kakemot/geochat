@@ -6,8 +6,8 @@
 </div>
     <div class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
-        <div v-if="msg.isYou" class="text-right text-blue-200">{{ msg.text }}</div>
-        <div v-if="!msg.isYou" class="text-left">{{ msg.text }} </div>
+        <div v-if="msg.username == username" class="text-right text-blue-200">{{ msg.text }}</div>
+        <div v-if="msg.username != username" class="text-left">{{msg.username}}: {{ msg.text }} </div>
       </div>
     </div>
 
@@ -34,6 +34,7 @@ import { generateRandomName } from '@/utils/randomNameGen';
 interface Message {
     isYou: boolean;
     text: string;
+    username: string;
     timestamp: number;
 }
 
@@ -43,7 +44,19 @@ interface ReverseGeocodeResponse {
 
 const errorMessage = ref(null);
 const userLocation = ref({latitude: 0, longitude: 0, city: 'Antarctica'}); // Initial dummy value, will be replaced
-const username = ref(generateRandomName());
+
+    const username = ref('');
+    // Initialize the cookie with 'username' key. The useCookie composable handles the reactivity.
+  const cookie = useCookie('username');
+    // Check if the cookie has a value. If not, generate a new random name and set it as the cookie's value.
+    if (!cookie.value) { // Correctly check the value of the reactive reference
+      cookie.value = generateRandomName(); // Set the cookie's value
+    }
+
+    // Bind the cookie's value to the username ref. This will update username whenever the cookie changes.
+    username.value = cookie.value;
+
+
 const messages = ref<Message[]>([]);
 const input = ref('');
 const messageContainer = ref(null);
@@ -61,7 +74,9 @@ function initializeWebSocket() {
             socket.send(JSON.stringify({
                 type: 'location',
                 latitude: userLocation.value.latitude,
-                longitude: userLocation.value.longitude
+                longitude: userLocation.value.longitude,
+                city: userLocation.city,
+                username: username.value
             }));
         }
     };
@@ -71,12 +86,16 @@ function initializeWebSocket() {
             const reader = new FileReader();
             reader.onload = function() {
                 const text = reader.result as string;
-                addMessage(false, text);
+                const obj = JSON.parse(text);
+                let isYou = event.data.includes(username.value);
+                     console.log(obj.content);
+                addMessage(isYou, obj.content, obj.username );
             };
             reader.readAsText(event.data);
         } else {
-            // Data is already text
-            addMessage(false, event.data);
+          const obj = JSON.parse(event.data);
+            let isYou = event.data.username == username.value;
+            addMessage(isYou, obj.content, obj.username);
         }
     };
 
@@ -113,7 +132,8 @@ onMounted(() => {
                 userLocation.value = {
                     latitude: position.coords.latitude.toFixed(6),
                     longitude: position.coords.longitude.toFixed(6),
-                    city: await fetchCityByCoordinates(position.coords.latitude, position.coords.longitude)
+                    city: await fetchCityByCoordinates(position.coords.latitude, position.coords.longitude),
+                    username: username.value
                 };
                 // Initialize WebSocket connection after getting location
                 initializeWebSocket();
@@ -135,10 +155,11 @@ onUnmounted(() => {
     }
 });
 
-function addMessage(isYou: boolean, text: string) {
+function addMessage(isYou: boolean, text: string, user: string) {
     const newMessage: Message = {
         isYou,
         text,
+        username: user,
         timestamp: Date.now() // Use the current timestamp
     };
     messages.value.push(newMessage);
@@ -151,9 +172,10 @@ function sendMessage() {
     if (socket && input.value.trim() !== '') {
                   socket.send(JSON.stringify({
                 type: 'chat',
-                content: `${username.value}: ${input.value}`,
+                content: `${input.value}`,
+                username: username.value
             }));
-        addMessage(true, input.value);
+        addMessage(true, input.value, username.value);
         input.value = '';
     }
 }
