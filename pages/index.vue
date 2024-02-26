@@ -2,7 +2,7 @@
 <div class="flex flex-col m-6 items-center justify-center">
 <div class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc">
 <div><span class="text-slate-500"> username </span><strong>{{ username }}</strong></div>
-<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.latitude }}° {{ userLocation.longitude }}°]</div>
+<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.city }}]</div>
 </div>
     <div class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
@@ -37,8 +37,12 @@ interface Message {
     timestamp: number;
 }
 
+interface ReverseGeocodeResponse {
+  city: string;
+}
+
 const errorMessage = ref(null);
-const userLocation = ref({latitude: 0, longitude: 0}); // Initial dummy value, will be replaced
+const userLocation = ref({latitude: 0, longitude: 0, city: 'Antarctica'}); // Initial dummy value, will be replaced
 const username = ref(generateRandomName());
 const messages = ref<Message[]>([]);
 const input = ref('');
@@ -85,13 +89,31 @@ function initializeWebSocket() {
     };
 }
 
+async function fetchCityByCoordinates(latitude: number, longitude: number): Promise<string> {
+  const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}`;
+  
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data: ReverseGeocodeResponse = await response.json();
+    return data.city;
+  } catch (error) {
+    console.error('Failed to fetch city:', error);
+    throw error; // Rethrow the error if you want to handle it outside this function
+  }
+}
+
 onMounted(() => {
           if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            position => {
+            async position => {
                 userLocation.value = {
-                    latitude: position.coords.latitude.toFixed(1),
-                    longitude: position.coords.longitude.toFixed(1)
+                    latitude: position.coords.latitude.toFixed(6),
+                    longitude: position.coords.longitude.toFixed(6),
+                    city: await fetchCityByCoordinates(position.coords.latitude, position.coords.longitude)
                 };
                 // Initialize WebSocket connection after getting location
                 initializeWebSocket();
