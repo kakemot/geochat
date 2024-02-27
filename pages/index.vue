@@ -4,11 +4,19 @@
 <div><span class="text-slate-500"> username </span><strong>{{ username }}</strong></div>
 <div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.city }}]</div>
 </div>
-    <div class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
+    <div v-if="connected" class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
         <div v-if="msg.username == username" class="text-right text-blue-200">{{ msg.text }}</div>
         <div v-if="msg.username != username" class="text-left">{{msg.username}}: {{ msg.text }} </div>
       </div>
+    </div>
+
+    <div v-else class="w-full text-center">
+      Connecting...
+          <Icon class="animate-spin" name="uil:spinner-alt"/>
+          <p v-if="!disconnected">Connection will happen when device location is found. You must allow location services on your device.</p>
+          <p v-if="disconnected">You session ended abruptly or perhaps very long ago. Refresh the page to reconnect.</p>
+          <UButton @click="refresh">Refresh page</UButton>
     </div>
 
     <div class="flex flex-row wcalc">
@@ -60,8 +68,14 @@ const userLocation = ref({latitude: 0, longitude: 0, city: 'Antarctica'}); // In
 const messages = ref<Message[]>([]);
 const input = ref('');
 const messageContainer = ref(null);
+const connected = ref(false);
+const disconnected = ref(false);
 
 let socket: WebSocket | null = null;
+
+function refresh() {
+  location.reload();
+}
 
 function initializeWebSocket() {
     let chatServerHost = window.location.protocol === "https:" ? "wss://geochat-bridge-quqoh4a5iq-ew.a.run.app/chat" : "ws://localhost:8081/chat";
@@ -69,6 +83,7 @@ function initializeWebSocket() {
 
     socket.onopen = function(event) {
         console.log('Connected to WebSocket');
+        connected.value = true;
         // Send location immediately upon connection
         if (socket) {
             socket.send(JSON.stringify({
@@ -100,6 +115,8 @@ function initializeWebSocket() {
     };
 
     socket.onclose = function(event: CloseEvent) {
+        connected.value = false;
+        disconnected.value = true;
         console.log('Disconnected from WebSocket');
     };
 
