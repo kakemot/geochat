@@ -5,9 +5,9 @@
 <div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.city }}][{{userLocation.locality}}]</div>
 </div>
     <div v-if="connected" class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
-      <div v-for="msg in messages" :key="msg" class="text-green-300">
-        <div v-if="msg.username == username" class="text-left text-blue-200"><span class="p-0 text-xs/[10px] text-slate-400">[{{msg.locality}}]</span> {{msg.username}}: {{ msg.text }} </div>
-        <div v-if="msg.username != username" class="text-left"><span class="p-0 text-xs/[10px] text-slate-400">[{{msg.locality}}]</span> {{msg.username}}: {{ msg.text }} </div>
+      <div v-for="msg in messages" :key="msg" class="text-green-300 mb-4">
+        <div v-if="msg.username == username" class="text-left text-blue-200"><span class="block p-0 text-xs/[10px] text-slate-400">[{{msg.locality}}] {{msg.username}}:</span> {{ msg.text }} </div>
+        <div v-if="msg.username != username" class="text-left"><span class="block p-0 text-xs/[10px] text-slate-400">[{{msg.locality}}] {{msg.username}}:</span> {{ msg.text }} </div>
       </div>
     </div>
 
