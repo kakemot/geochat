@@ -2,12 +2,12 @@
 <div class="flex flex-col m-6 items-center justify-center">
 <div class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc">
 <div><span class="text-slate-500"> username </span><strong>{{ username }}</strong></div>
-<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.city }}]</div>
+<div v-if="userLocation" class="text-xs text-slate-500">[{{ userLocation.city }}][{{userLocation.locality}}]</div>
 </div>
     <div v-if="connected" class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800" ref="messageContainer">
       <div v-for="msg in messages" :key="msg" class="text-green-300">
-        <div v-if="msg.username == username" class="text-right text-blue-200">{{ msg.text }}</div>
-        <div v-if="msg.username != username" class="text-left">{{msg.username}}: {{ msg.text }} </div>
+        <div v-if="msg.username == username" class="text-left text-blue-200"><span class="p-0 text-xs/[10px] text-slate-400">[{{msg.locality}}]</span> {{msg.username}}: {{ msg.text }} </div>
+        <div v-if="msg.username != username" class="text-left"><span class="p-0 text-xs/[10px] text-slate-400">[{{msg.locality}}]</span> {{msg.username}}: {{ msg.text }} </div>
       </div>
     </div>
 
@@ -44,15 +44,17 @@ interface Message {
     text: string;
     username: string;
     timestamp: number;
+    locality: string;
 }
 
 interface ReverseGeocodeResponse {
   city: string;
+  locality: string;
 }
 
 const errorMessage = ref(null);
 const userLocation = ref({latitude: 0, longitude: 0, city: 'Antarctica'}); // Initial dummy value, will be replaced
-
+const locResult = ref<ReverseGeocodeResponse>()
     const username = ref('');
     // Initialize the cookie with 'username' key. The useCookie composable handles the reactivity.
   const cookie = useCookie('username');
@@ -91,7 +93,8 @@ function initializeWebSocket() {
                 latitude: userLocation.value.latitude,
                 longitude: userLocation.value.longitude,
                 city: userLocation.city,
-                username: username.value
+                username: username.value,
+                locality: userLocation.locality
             }));
         }
     };
@@ -104,13 +107,13 @@ function initializeWebSocket() {
                 const obj = JSON.parse(text);
                 let isYou = event.data.includes(username.value);
                      console.log(obj.content);
-                addMessage(isYou, obj.content, obj.username );
+                addMessage(isYou, obj.content, obj.username, obj.locality);
             };
             reader.readAsText(event.data);
         } else {
           const obj = JSON.parse(event.data);
             let isYou = event.data.username == username.value;
-            addMessage(isYou, obj.content, obj.username);
+            addMessage(isYou, obj.content, obj.username, obj.locality);
         }
     };
 
@@ -125,7 +128,7 @@ function initializeWebSocket() {
     };
 }
 
-async function fetchCityByCoordinates(latitude: number, longitude: number): Promise<string> {
+async function fetchCityByCoordinates(latitude: number, longitude: number): Promise<any> {
   const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}`;
   
   try {
@@ -135,7 +138,8 @@ async function fetchCityByCoordinates(latitude: number, longitude: number): Prom
     }
 
     const data: ReverseGeocodeResponse = await response.json();
-    return data.city;
+    console.log(data);
+    return data;
   } catch (error) {
     console.error('Failed to fetch city:', error);
     throw error; // Rethrow the error if you want to handle it outside this function
@@ -146,10 +150,12 @@ onMounted(() => {
           if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             async position => {
+                locResult.value = await fetchCityByCoordinates(position.coords.latitude, position.coords.longitude)
                 userLocation.value = {
                     latitude: position.coords.latitude.toFixed(6),
                     longitude: position.coords.longitude.toFixed(6),
-                    city: await fetchCityByCoordinates(position.coords.latitude, position.coords.longitude),
+                    city: locResult.value.city,
+                    locality: locResult.value.locality,
                     username: username.value
                 };
                 // Initialize WebSocket connection after getting location
@@ -172,13 +178,15 @@ onUnmounted(() => {
     }
 });
 
-function addMessage(isYou: boolean, text: string, user: string) {
+function addMessage(isYou: boolean, text: string, user: string, local: string) {
     const newMessage: Message = {
         isYou,
         text,
         username: user,
-        timestamp: Date.now() // Use the current timestamp
+        timestamp: Date.now(),
+        locality: local
     };
+    console.log(newMessage)
     messages.value.push(newMessage);
     nextTick(() => {
         scrollToBottom();
@@ -190,9 +198,10 @@ function sendMessage() {
                   socket.send(JSON.stringify({
                 type: 'chat',
                 content: `${input.value}`,
-                username: username.value
+                username: username.value,
+                locality: locResult.value.locality
             }));
-        addMessage(true, input.value, username.value);
+        addMessage(true, input.value, username.value, locResult.value.locality);
         input.value = '';
     }
 }
