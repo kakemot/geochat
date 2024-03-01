@@ -64,7 +64,7 @@ const API_BASE_URL = 'https://geochat-api-quqoh4a5iq-ew.a.run.app';
 
 const fetchMessages = async (city: string) => {
   try {
-    const result = await fetch(`${API_BASE_URL}/messages?lastChecked=${lastChecked}&city=${city}`);
+    const result = await fetch(`${API_BASE_URL}/messages?lastChecked=${lastChecked}&city=${userLocation.city}`);
     if (!result.ok) {
       throw new Error('Failed to fetch messages');
     }
@@ -83,6 +83,7 @@ const fetchMessages = async (city: string) => {
       };
       messages.value.push(message);
     });
+    scrollToBottom()
   } catch (error) {
     console.error('Error fetching messages:', error);
   }
