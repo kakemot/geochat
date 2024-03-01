@@ -89,15 +89,17 @@ const fetchMessages = async (city: string) => {
 };
 
 function sendMessage() {    
+  let inp = input.value.toString();
   if (input.value.trim() !== '') {
     const messageData = {
       username: username.value,
       city: userLocation.value.city,
       locality: locResult.value?.locality || '',
-      content: input.value,
+      content: inp,
       time: new Date().toISOString(),
     };
-
+    input.value = '';
+    messages.value.push(messageData);
     fetch(`${API_BASE_URL}/messages`, {
       method: 'POST',
       headers: {
@@ -111,7 +113,7 @@ function sendMessage() {
           username: username.value,
           city: userLocation.value.city,
           locality: userLocation.value.locality,
-          content: input.value.ToString(),
+          content: inp,
           time: new Date().toISOString()
       };
         messages.value.push(msg);
