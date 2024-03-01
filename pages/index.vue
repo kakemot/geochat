@@ -60,7 +60,7 @@ const messages = ref<Message[]>([]);
 const input = ref('');
 const messageContainer = ref<HTMLElement | null>(null);
 let lastChecked = new Date('2018-05-05').toISOString();
-const API_BASE_URL = 'https://localhost:7216';
+const API_BASE_URL = 'https://geochat-api-quqoh4a5iq-ew.a.run.app';
 
 const fetchMessages = async (city: string) => {
   try {
