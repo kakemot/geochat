@@ -108,24 +108,12 @@ function sendMessage() {
       body: JSON.stringify(messageData),
     })
       .then(response => {
-        if (response.ok) {
-          const msg: Message = {
-          username: username.value,
-          city: userLocation.value.city,
-          locality: userLocation.value.locality,
-          content: inp,
-          time: new Date().toISOString()
-      };
-        messages.value.push(msg);
-        input.value = '';
-        }
-
         if (!response.ok) {
           const msg: Message = {
           username: 'Z̶̧̬̙̞͑̏̇̋Ḧ̵̳̠̩͎́͒o̸̞̗͍̫̾̌̒͠r̶̳̹͋̀g̴̣̘̪͆̏̏̅',
           city: 'Planet 68',
           locality: 'Penal Colony District 48',
-          content: 'ERROR: Error caused wormhole. Explanation: not good',
+          content: 'ERROR: Error caused wormhole. Explanation: not good - message lost',
           time: new Date().toISOString()
       };
         messages.value.push(msg);
@@ -200,7 +188,7 @@ if (userLocation.city = "The Void" && triedLocation) {
         username: 'Cthulhu',
         city: 'void',
         locality: 'null',
-        content: 'Greetings, you are in the void, the location-less place. You are currently not allowing GeoSPK to access your location. You can only talk to other wanderers of the dark until you do.',
+        content: 'Greetings! Waiting for location from your device...',
         time: new Date().toISOString()
       };
       messages.value.push(msg);
@@ -210,7 +198,7 @@ if (userLocation.city = "The Void" && triedLocation) {
         username: 'The Creator',
         city: 'void',
         locality: 'null',
-        content: 'NOTE: Lots of things are changing and the chat might not work properly for while',
+        content: 'NOTE: Lots of things are changing and there are bugs.',
         time: new Date().toISOString()
       };
       messages.value.push(msg2);
