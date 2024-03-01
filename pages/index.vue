@@ -43,7 +43,7 @@ interface ReverseGeocodeResponse {
   city: string;
   locality: string;
 }
-
+let intervalId;
 const connected = ref(true);
 const errorMessage = ref<string | null>(null);
 const userLocation = ref<{ latitude: string; longitude: string; city: string; locality?: string }>({ latitude: '0', longitude: '0', city: 'The Void' });
@@ -202,6 +202,5 @@ if (userLocation.city = "The Void" && triedLocation) {
         time: new Date().toISOString()
       };
       messages.value.push(msg2);
-
-setTimeout(() => fetchMessages(userLocation.city), 7 * 1000);  
+intervalId = setInterval(() => fetchMessages(userLocation.city), 7 * 1000);  
 </script>
