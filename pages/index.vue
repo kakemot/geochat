@@ -98,7 +98,7 @@ function sendMessage() {
       time: new Date().toISOString(),
     };
 
-    fetch(`${API_BASE_URL}/postMessage`, {
+    fetch(`${API_BASE_URL}/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
