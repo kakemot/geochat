@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare",
     "start:ws": "node server.cjs",
     "startdev": "concurrently \"npm run dev\" \"npm run start:ws\"",
-    "start": "nuxt start"
+    "start": "concurrently \"nuxt start\" \"npm run start:ws\""
 
   },
   "dependencies": {
