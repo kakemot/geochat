@@ -21,4 +21,3 @@ ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=8080
 
 CMD [ "npm", "start" ]
-CMD [ "node", "server.cjs" ]
