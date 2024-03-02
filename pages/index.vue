@@ -80,7 +80,7 @@ function refresh() {
 }
 
 function initializeWebSocket() {
-    let chatServerHost = window.location.protocol === "https:" ? "wss://geochat-bridge:10000/chat" : "ws://localhost:8081/chat";
+    let chatServerHost = window.location.protocol === "https:" ? "wss://geochat-bridge.onrender.com/chat" : "ws://localhost:8081/chat";
     socket = new WebSocket(chatServerHost);
 
     socket.onopen = function(event) {
