@@ -1,13 +1,17 @@
 export function generateRandomName(): string {
     const words = [
-        "hest", "mann", "fisk", "orm", "leir", "katt", "hund", "båt", "fugl", "barn", "snø", "regn", "sol", "måne", "stjerne",
-        "bok", "pen", "stor", "liten", "bred", "tynn", "glad", "sur", "søt", "salt", "kald", "varm", "våt", "tørr", "ny", 
-        "gammel", "ung", "rask", "treg", "lys", "mørk", "høy", "lav", "dyr", "billig", "tom", "full", "hard", "myk", "skarp",
-        "sløv", "ren", "skitten", "sterk", "svak", "tykk", "tynn", "lang", "kort", "bred", "smal", "flat", "dyp", "hvit", 
-        "svart", "rød", "blå", "grønn", "gul", "rosa", "grå", "brun", "klar", "matt", "tett", "løs", "hel", "del", "før", 
-        "etter", "over", "under", "med", "uten", "for", "mot", "til", "fra", "opp", "ned", "inn", "ut", "på", "av", "som",
-        "enn", "men", "og", "eller", "når", "hvis", "da", "at", "et", "en", "den", "det", "flå", "klegg", "anon", "frykt", "båre", "hest", "redsel", "nrk", "bbc", "flere", "måne", "årsak"
-    ];
+        "able", "acid", "aged", "also", "area", "army", "away", "baby", "back", "ball",
+        "band", "bank", "base", "bath", "bear", "beat", "been", "beer", "bell", "belt",
+        "best", "bill", "bird", "blow", "blue", "boat", "body", "bomb", "bond", "bone",
+        "book", "boom", "boot", "bore", "born", "boss", "both", "bowl", "bulk", "burn",
+        "bush", "busy", "call", "calm", "came", "camp", "card", "care", "case", "cash",
+        "cast", "cell", "chat", "chip", "city", "club", "coal", "coat", "code", "cold",
+        "come", "cook", "cool", "cope", "copy", "core", "cost", "crew", "crop", "dark",
+        "data", "date", "dawn", "days", "dead", "deal", "dean", "dear", "debt", "deep",
+        "deny", "desk", "dial", "dick", "diet", "disc", "disk", "does", "done", "door",
+        "dose", "down", "draw", "drew", "drop", "drug", "dual", "duck", "duly", "dust"
+    ]
+    
     const firstWordIndex = Math.floor(Math.random() * words.length);
     let secondWordIndex = Math.floor(Math.random() * words.length);
     while (secondWordIndex === firstWordIndex) {
