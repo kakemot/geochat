@@ -150,13 +150,13 @@ function initializeWebSocket() {
         const obj = JSON.parse(text);
         let isYou = event.data.includes(username.value);
         console.log(obj.content);
-        addMessage(isYou, obj.content, obj.username, obj.locality);
+        addMessage(isYou, obj.content, obj.username, obj.locality, obj.timestamp);
       };
       reader.readAsText(event.data);
     } else {
       const obj = JSON.parse(event.data);
       let isYou = event.data.username == username.value;
-      addMessage(isYou, obj.content, obj.username, obj.locality);
+      addMessage(isYou, obj.content, obj.username, obj.locality, obj.timestamp);
     }
   };
 
@@ -226,12 +226,12 @@ onMounted(() => {
   }
 });
 
-function addMessage(isYou: boolean, text: string, user: string, local: string) {
+function addMessage(isYou: boolean, text: string, user: string, local: string, timestamp: number) {
   const newMessage: Message = {
     isYou,
     text,
     username: user,
-    timestamp: Date.now(),
+    timestamp: timestamp,
     locality: local,
   };
   console.log(newMessage);
@@ -249,9 +249,10 @@ function sendMessage() {
         content: `${input.value}`,
         username: username.value,
         locality: userLocation.value.locality,
+        timestamp: Date.now()
       })
     );
-    addMessage(true, input.value, username.value, userLocation.value.locality);
+    addMessage(true, input.value, username.value, userLocation.value.locality, Date.now());
     input.value = "";
   }
 }

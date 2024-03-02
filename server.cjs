@@ -31,7 +31,7 @@ function broadcastMessage(username, content, locality, senderWs, senderLocation,
     });
 }
 
-function sendLastMessages(client, city, locality, timestamp) {
+function sendLastMessages(client, city, locality) {
     const messages = messagesByCity.get(city) || [];
     messages.forEach(({ username, content, locality, timestamp }) => {
         // Send both username and content as a JSON string
@@ -46,7 +46,7 @@ wss.on('connection', function connection(ws) {
             const city = message.city;
             clients.set(ws, { city: message.city });
             console.log("send last messages in " + city)
-            sendLastMessages(ws, city, message.locality, message.timestamp); // Send last 10 messages for this city
+            sendLastMessages(ws, city, message.locality); // Send last 10 messages for this city
         } else if (message.type === 'chat') {
             console.log('received: %s', message.content);
             const senderLocation = clients.get(ws);
