@@ -70,7 +70,7 @@
 }
 
 .abs {
-  position: absolute;
+  position: fixed;
   top: 0px;
 }
 
