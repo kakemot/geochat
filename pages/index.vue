@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col m-6 items-center justify-center">
+  <div class="flex flex-col items-center justify-center overflow-hidden w-full">
     <div
       class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc"
     >
@@ -27,8 +27,9 @@
         </div>
         <div v-if="msg.username != username" class="text-left">
           <span class="block p-0 text-xs/[10px] text-slate-400">
-          [{{ msg.locality }}] <span class="text-slate-300">{{ msg.username }}</span>
-          {{ formatDate(msg.timestamp) }}
+            [{{ msg.locality }}]
+            <span class="text-slate-300">{{ msg.username }}</span>
+            {{ formatDate(msg.timestamp) }}
           </span>
           {{ msg.text }}
         </div>
@@ -43,21 +44,21 @@
         location services on your device.
       </p>
       <p v-if="disconnected">
-        You session ended abruptly or perhaps very long ago. Refresh the page to
-        reconnect.
+        You session ended abruptly. Trying reconnect. Refresh the page to
+        reconnect immediately.
       </p>
       <UButton @click="refresh">Refresh page</UButton>
     </div>
 
-    <div class="flex flex-row wcalc">
+    <div class="flex flex-row w-full textfield">
       <textarea
         v-model="input"
         @keyup.enter="sendMessage"
         placeholder="Type a message..."
-        class="w-full p-2 rounded-l outline-none text-lg"
+        class="w-full p-2 outline-none border border-slate-400 bg-slate-900 rounded-none text-lg"
       ></textarea>
-      <button @click="sendMessage" class="bg-slate-800 text-white p-2">
-        send
+      <button :disabled="disconnected" @click="sendMessage" class="bg-green-800 w-16 disabled:bg-gray-700 disabled:text-gray-400 text-white border border-slate-400 p-2 hover:bg-orange-300">
+        <Icon size="lg" name="uil:caret-right" />
       </button>
     </div>
   </div>
@@ -65,11 +66,15 @@
 
 <style scoped>
 .messages {
-  height: calc(100vh - 17em);
+  height: calc(100vh - 129px);
 }
 
 .wcalc {
-  width: calc(100vw - 2em);
+  width: 100vw;
+}
+
+.textfield {
+  height: 80px;
 }
 </style>
 
@@ -96,7 +101,7 @@ const username = ref("");
 // Initialize the cookie with 'username' key. The useCookie composable handles the reactivity.
 const cookie = useCookie("username");
 if (!useCookie("city").value) {
-  useCookie("city").value = 'Antarctica'
+  useCookie("city").value = "Antarctica";
 }
 // Check if the cookie has a value. If not, generate a new random name and set it as the cookie's value.
 if (!cookie.value) {
@@ -128,13 +133,14 @@ function initializeWebSocket() {
 
   socket.onopen = function (event) {
     console.log("Connected to WebSocket");
+    disconnected.value = false;
     connected.value = true;
     // Send location immediately upon connection
     if (socket) {
       socket.send(
         JSON.stringify({
           type: "location",
-          city: useCookie('city').value,
+          city: useCookie("city").value,
           username: username.value,
           locality: userLocation.locality,
         })
@@ -150,7 +156,13 @@ function initializeWebSocket() {
         const obj = JSON.parse(text);
         let isYou = event.data.includes(username.value);
         console.log(obj.content);
-        addMessage(isYou, obj.content, obj.username, obj.locality, obj.timestamp);
+        addMessage(
+          isYou,
+          obj.content,
+          obj.username,
+          obj.locality,
+          obj.timestamp
+        );
       };
       reader.readAsText(event.data);
     } else {
@@ -193,11 +205,11 @@ async function fetchCityByCoordinates(
 }
 
 onMounted(() => {
-          userLocation.value = {
-          city: useCookie('city') ?? 'Antarctica',
-          locality: 'void',
-          username: username,
-        };
+  userLocation.value = {
+    city: useCookie("city") ?? "Antarctica",
+    locality: "void",
+    username: username,
+  };
 
   initializeWebSocket();
 
@@ -210,10 +222,10 @@ onMounted(() => {
         );
         userLocation.value = {
           city: locResult.value.city,
-          locality: locResult.value.locality ?? 'void',
+          locality: locResult.value.locality ?? "void",
           username: username.value,
         };
-        useCookie('city').value = locResult.value.city;
+        useCookie("city").value = locResult.value.city;
       },
       (error) => {
         errorMessage.value = `Error getting user location: ${error.message}`;
@@ -226,7 +238,13 @@ onMounted(() => {
   }
 });
 
-function addMessage(isYou: boolean, text: string, user: string, local: string, timestamp: number) {
+function addMessage(
+  isYou: boolean,
+  text: string,
+  user: string,
+  local: string,
+  timestamp: number
+) {
   const newMessage: Message = {
     isYou,
     text,
@@ -249,10 +267,16 @@ function sendMessage() {
         content: `${input.value}`,
         username: username.value,
         locality: userLocation.value.locality,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       })
     );
-    addMessage(true, input.value, username.value, userLocation.value.locality, Date.now());
+    addMessage(
+      true,
+      input.value,
+      username.value,
+      userLocation.value.locality,
+      Date.now()
+    );
     input.value = "";
   }
 }
@@ -273,18 +297,24 @@ function formatDate(millis: string): string {
   return `${dayOfWeek} ${hours}:${minutes}`;
 }
 
+watch(disconnected, (newValue, oldValue) => {
+  if (newValue) {
+    setTimeout(initializeWebSocket, 1000);
+  }
+});
+
 watch(
   () => userLocation.value.city,
   (newCity, oldCity) => {
     // This callback will be executed on changes to the city property.
     // Update the cookie value here.
-    if (newCity != 'Antarctica') {
-          useCookie('city').value = newCity;
+    if (newCity != "Antarctica") {
+      useCookie("city").value = newCity;
     }
   },
   {
     deep: true, // This option is not necessary for primitive types like strings but is kept for completeness.
-    immediate: true // Trigger immediately with the current value
+    immediate: true, // Trigger immediately with the current value
   }
 );
 </script>
