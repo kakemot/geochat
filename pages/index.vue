@@ -13,7 +13,7 @@
     </div>
     <div
       v-if="connected"
-      class="messages wcalc mt-12 p-2 pb-20 bg-slate-800 border-l border-b border-r border-green-800"
+      class="messages wcalc p-2 pt-14 pb-14 bg-slate-800 border-l border-b border-r border-green-800"
       ref="messageContainer"
     >
       <div v-for="msg in messages" :key="msg" class="text-green-300 mb-4">
