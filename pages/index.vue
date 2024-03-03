@@ -13,7 +13,7 @@
     </div>
     <div
       v-if="connected"
-      class="messages wcalc overflow-y-scroll mt-12 min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800"
+      class="messages wcalc mt-12 p-2 pb-20 bg-slate-800 border-l border-b border-r border-green-800"
       ref="messageContainer"
     >
       <div v-for="msg in messages" :key="msg" class="text-green-300 mb-4">
@@ -65,10 +65,6 @@
 </template>
 
 <style scoped>
-.messages {
-  height: calc(100vh - 19vh);
-}
-
 .wcalc {
   width: 100vw;
 }
@@ -78,13 +74,15 @@
   top: 0px;
 }
 
-.abs-bottom {
-  position: absolute;
-  bottom: 0px;
+.messages {
+  height: calc(100vh - 10vh); /* Subtract the height of the .abs-bottom container from the viewport height */
+  overflow-y: auto; /* Add scroll to the messages container if content overflows */
 }
 
-.textfield {
-  height: 80px;
+.abs-bottom {
+  height: 10vh;
+  position: absolute;
+  bottom: 0px;
 }
 </style>
 
