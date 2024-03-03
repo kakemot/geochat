@@ -81,8 +81,9 @@
 
 .abs-bottom {
   height: 10vh;
-  position: absolute;
+  position: fixed;
   bottom: 0px;
+  z-index: 100;
 }
 </style>
 
