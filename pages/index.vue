@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center overflow-hidden w-full">
     <div
-      class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc sticky"
+      class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc abs bg-slate-900"
     >
       <div>
         <span class="text-slate-500"> username </span
@@ -13,7 +13,7 @@
     </div>
     <div
       v-if="connected"
-      class="messages wcalc overflow-y-scroll min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800"
+      class="messages wcalc overflow-y-scroll mt-12 min-h-20 p-2 bg-slate-800 border-l border-b border-r border-green-800"
       ref="messageContainer"
     >
       <div v-for="msg in messages" :key="msg" class="text-green-300 mb-4">
@@ -50,7 +50,7 @@
       <UButton @click="refresh">Refresh page</UButton>
     </div>
 
-    <div class="flex flex-row w-full textfield">
+    <div class="flex flex-row w-full textfield abs-bottom">
       <textarea
         v-model="input"
         @keyup.enter="sendMessage"
@@ -66,11 +66,21 @@
 
 <style scoped>
 .messages {
-  height: calc(100vh - 149px);
+  height: calc(100vh - 129px);
 }
 
 .wcalc {
   width: 100vw;
+}
+
+.abs {
+  position: absolute;
+  top: 0px;
+}
+
+.abs-bottom {
+  position: absolute;
+  bottom: 0px;
 }
 
 .textfield {
