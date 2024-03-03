@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <div v-else class="w-full text-center">
+    <div v-else class="w-full text-center mt-20">
       Connecting...
       <Icon class="animate-spin" name="uil:spinner-alt" />
       <p v-if="!disconnected">
@@ -66,7 +66,7 @@
 
 <style scoped>
 .messages {
-  height: calc(100vh - 129px);
+  height: calc(100vh - 19vh);
 }
 
 .wcalc {
