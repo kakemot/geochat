@@ -172,7 +172,7 @@ function initializeWebSocket() {
         const text = reader.result as string;
         const obj = JSON.parse(text);
         let isYou = event.data.includes(username.value);
-        console.log(obj.content);
+        
         addMessage(
           isYou,
           obj.content,
@@ -278,6 +278,7 @@ function addMessage(
 
 function sendMessage() {
   if (socket && input.value.trim() !== "" && input.value.length < maxChars.value) {
+    input.value = sanitizeString(input.value);
     socket.send(
       JSON.stringify({
         type: "chat",
@@ -334,4 +335,9 @@ watch(
     immediate: true, // Trigger immediately with the current value
   }
 );
+
+function sanitizeString(str: string){
+    str = str.replace(/[^a-z0-9áéíóúñü \.,_-]/gim,"");
+    return str.trim();
+}
 </script>
