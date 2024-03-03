@@ -17,7 +17,7 @@
       ref="messageContainer"
     >
       <div v-for="msg in messages" :key="msg" class="text-green-300 mb-4">
-        <div v-if="msg.username == username" class="text-left text-blue-200">
+        <div v-if="msg.username == username" class="text-left text-blue-200 break-words">
           <span class="block p-0 text-xs/[10px] text-slate-400"
             >[{{ msg.locality }}]
             <span class="text-slate-300">{{ msg.username }}</span>
@@ -25,7 +25,7 @@
           </span>
           {{ msg.text }}
         </div>
-        <div v-if="msg.username != username" class="text-left">
+        <div v-if="msg.username != username" class="text-left break-words">
           <span class="block p-0 text-xs/[10px] text-slate-400">
             [{{ msg.locality }}]
             <span class="text-slate-300">{{ msg.username }}</span>
@@ -49,7 +49,7 @@
       </p>
       <UButton @click="refresh">Refresh page</UButton>
     </div>
-
+    <div :class="input.length > maxChars ? 'text-red-500 input-monitor' : 'text-slate-200 input-monitor'">{{ input.length }} / {{ maxChars }}</div>
     <div class="flex flex-row w-full textfield abs-bottom">
       <textarea
         v-model="input"
@@ -57,7 +57,7 @@
         placeholder="Type a message..."
         class="w-full p-2 outline-none border border-slate-400 bg-slate-900 rounded-none text-lg"
       ></textarea>
-      <button :disabled="disconnected" @click="sendMessage" class="bg-green-800 w-16 disabled:bg-gray-700 disabled:text-gray-400 text-white border border-slate-400 p-2 hover:bg-orange-300">
+      <button :disabled="disconnected || input.length > maxChars" @click="sendMessage" class="bg-green-800 w-16 disabled:bg-gray-700 disabled:text-gray-400 text-white border border-slate-400 p-2 hover:bg-orange-300">
         <Icon size="20" name="uil:message" />
       </button>
     </div>
@@ -84,6 +84,12 @@
   position: fixed;
   bottom: 0px;
   z-index: 100;
+}
+
+.input-monitor {
+  position: absolute;
+  right: 10px;
+  bottom: 6rem;
 }
 </style>
 
@@ -121,6 +127,7 @@ if (!cookie.value) {
 // Bind the cookie's value to the username ref. This will update username whenever the cookie changes.
 username.value = cookie.value;
 
+const maxChars = ref(200);
 const messages = ref<Message[]>([]);
 const input = ref("");
 const messageContainer = ref(null);
@@ -269,7 +276,7 @@ function addMessage(
 }
 
 function sendMessage() {
-  if (socket && input.value.trim() !== "") {
+  if (socket && input.value.trim() !== "" && input.value.length < maxChars.value) {
     socket.send(
       JSON.stringify({
         type: "chat",
