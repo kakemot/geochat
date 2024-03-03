@@ -13,7 +13,7 @@
     </div>
     <div
       v-if="connected"
-      class="messages wcalc p-2 pt-14 pb-14 bg-slate-800 border-l border-b border-r border-green-800"
+      class="messages wcalc p-2 pt-14 pb-16 bg-slate-800 border-l border-b border-r border-green-800"
       ref="messageContainer"
     >
       <div v-for="msg in messages" :key="msg" class="text-green-300 mb-4">
@@ -153,6 +153,7 @@ function initializeWebSocket() {
     connected.value = true;
     // Send location immediately upon connection
     if (socket) {
+      messages.value = []
       socket.send(
         JSON.stringify({
           type: "location",
