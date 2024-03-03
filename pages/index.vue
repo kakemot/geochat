@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center overflow-hidden w-full">
     <div
-      class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc"
+      class="flex flex-row justify-between border-l border-t p-2 border-r border-green-800 wcalc sticky"
     >
       <div>
         <span class="text-slate-500"> username </span
@@ -66,7 +66,7 @@
 
 <style scoped>
 .messages {
-  height: calc(100vh - 129px);
+  height: calc(100vh - 149px);
 }
 
 .wcalc {
