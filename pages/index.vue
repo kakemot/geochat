@@ -145,7 +145,7 @@ function initializeWebSocket() {
     window.location.protocol === "https:"
       ? "wss://geochat-bridge.onrender.com/chat"
       : "ws://localhost:8081/chat";
-  socket = new WebSocket('ws://geochat-bridge-4niq:10000/chat');
+  socket = new WebSocket('wss://geochat-bridge-4niq:10000/chat');
 
   socket.onopen = function (event) {
     console.log("Connected to WebSocket");
