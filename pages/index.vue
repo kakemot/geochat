@@ -49,7 +49,7 @@
       </p>
       <UButton @click="refresh">Refresh page</UButton>
     </div>
-    <div :class="input.length > maxChars ? 'text-red-500 input-monitor' : 'text-slate-200 input-monitor'">{{ input.length }} / {{ maxChars }}</div>
+    <div v-if="input.length > 0" :class="'input-monitor bg-slate-600 p-2 ' + (input.length > maxChars ? 'text-red-300' : 'text-slate-200')">{{ input.length }} / {{ maxChars }}</div>
     <div class="flex flex-row w-full textfield abs-bottom">
       <textarea
         v-model="input"
