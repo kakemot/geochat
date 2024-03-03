@@ -89,7 +89,7 @@
 .input-monitor {
   position: absolute;
   right: 10px;
-  bottom: 6rem;
+  bottom: 5rem;
 }
 </style>
 
