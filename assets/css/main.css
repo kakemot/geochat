@@ -1,6 +1,11 @@
 body {
+    overflow: hidden; 
     font-family:monospace;
     background-color: black;
     margin: 0px;
     padding-bottom: env(safe-area-inset-bottom);
+}
+
+html {
+    overflow: hidden; 
 }
