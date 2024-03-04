@@ -55,7 +55,7 @@
         v-model="input"
         @keyup.enter="sendMessage"
         placeholder="Type a message..."
-        class="w-full p-2 outline-none border border-slate-400 bg-slate-900 rounded-none text-lg"
+        class="w-full p-2 outline-none border border-slate-400 text-white bg-slate-900 rounded-none text-lg"
       ></textarea>
       <button :disabled="disconnected || input.length > maxChars" @click="sendMessage" class="bg-green-800 w-16 disabled:bg-gray-700 disabled:text-gray-400 text-white border border-slate-400 p-2 hover:bg-orange-300">
         <Icon size="20" name="uil:message" />
