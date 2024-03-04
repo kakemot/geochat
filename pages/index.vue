@@ -23,7 +23,8 @@
             <span class="text-slate-300">{{ msg.username }}</span>
             {{ formatDate(msg.timestamp) }}
           </span>
-          {{ msg.text }}
+            <embed class="mt-2" v-if="msg.gifUrl" :src="msg.gifUrl">
+            <span v-else>{{ msg.text }}</span>
         </div>
         <div v-if="msg.username != username" class="text-left break-words">
           <span class="block p-0 text-xs/[10px] text-slate-400">
@@ -31,7 +32,8 @@
             <span class="text-slate-300">{{ msg.username }}</span>
             {{ formatDate(msg.timestamp) }}
           </span>
-          {{ msg.text }}
+            <embed class="mt-2" v-if="msg.gifUrl" :src="msg.gifUrl">
+            <span v-else>{{ msg.text }}</span>
         </div>
       </div>
     </div>
@@ -102,6 +104,7 @@ interface Message {
   username: string;
   timestamp: number;
   locality: string;
+  gifUrl: string;
 }
 
 interface ReverseGeocodeResponse {
@@ -178,14 +181,15 @@ function initializeWebSocket() {
           obj.content,
           obj.username,
           obj.locality,
-          obj.timestamp
+          obj.timestamp,
+          obj.gifUrl
         );
       };
       reader.readAsText(event.data);
     } else {
       const obj = JSON.parse(event.data);
       let isYou = event.data.username == username.value;
-      addMessage(isYou, obj.content, obj.username, obj.locality, obj.timestamp);
+      addMessage(isYou, obj.content, obj.username, obj.locality, obj.timestamp, obj.gifUrl);
     }
   };
 
@@ -255,20 +259,36 @@ onMounted(() => {
   }
 });
 
-function addMessage(
+async function fetchGifUrl(keyword: string) {
+    const apiUrl = `https://api.giphy.com/v1/gifs/random?api_key=SoAUjvZNkEdsTUcj8lw7TBZ0Av4JsaFo&tag=${keyword}&rating=g`;
+    try {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      return data.data.images.fixed_height.url;
+    } catch (error) {
+      console.error('Error fetching GIF:', error);
+      return '';
+    }
+  }
+
+async function addMessage(
   isYou: boolean,
   text: string,
   user: string,
   local: string,
-  timestamp: number
+  timestamp: number,
+  gifUrl: string
 ) {
+  text = text.replace(/^\s+|\s+$/g, '');
   const newMessage: Message = {
     isYou,
     text,
     username: user,
     timestamp: timestamp,
     locality: local,
+    gifUrl: gifUrl
   };
+
   console.log(newMessage);
   messages.value.push(newMessage);
   nextTick(() => {
@@ -276,8 +296,13 @@ function addMessage(
   });
 }
 
-function sendMessage() {
+async function sendMessage() {
+  let gifUrl = '';
   if (socket && input.value.trim() !== "" && input.value.length < maxChars.value) {
+    if (input.value.startsWith("gif:")) {
+        const keyword = input.value.substring(input.value.indexOf(":") + 1);
+        gifUrl = await fetchGifUrl(keyword);
+    }
     input.value = sanitizeString(input.value);
     socket.send(
       JSON.stringify({
@@ -286,6 +311,7 @@ function sendMessage() {
         username: username.value,
         locality: userLocation.value.locality,
         timestamp: Date.now(),
+        gifUrl: gifUrl
       })
     );
     addMessage(
@@ -293,7 +319,8 @@ function sendMessage() {
       input.value,
       username.value,
       userLocation.value.locality,
-      Date.now()
+      Date.now(),
+      gifUrl
     );
     input.value = "";
   }
@@ -337,6 +364,6 @@ watch(
 );
 
 function sanitizeString(str: string){
-    return str;
+    return str.trim();
 }
 </script>
