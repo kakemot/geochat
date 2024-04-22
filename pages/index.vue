@@ -355,7 +355,7 @@ watch(
     // Update the cookie value here.
     if (newCity != "Antarctica") {
       useCookie("city").value = newCity;
-      location.reload();
+      initializeWebSocket()
     }
   },
   {
